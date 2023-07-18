@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+green() {
+    printf "\e[0;32m$1\e[0m"
+}
+
+install() {
+    echo $(green "Downloading Jira Aliases script...")
+    curl -L#o /var/tmp/gg_$$ https://raw.githubusercontent.com/csi-lk/jira-aliases/master/bin/ja
+    echo $(green "Setting permissions...")
+    chmod -v +x /var/tmp/ja_$$
+    echo $(green "Moving to \$PATH")
+    sudo mv -fv /var/tmp/ja_$$ /usr/local/bin/ja
+    echo $(green "Successfully installed, running setup")
+    ja -h
+}
+
+install

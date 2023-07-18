@@ -144,8 +144,8 @@ EOF
 
 }
 
-open() {
-  echo "$JIRA_URL"
+version() {
+  echo "$VERSION"
 }
 
 display_help() {
@@ -172,6 +172,7 @@ else
     case $1 in
     c | create) create ;;
     o | open) open ;;
+    -v | v | -V | version) version ;;
     -h | --help | help) display_help ;;
     *)
       unknown_command "$@"
