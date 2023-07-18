@@ -227,6 +227,27 @@ focus_on_ticket() {
   echo $(green "Focusing on ticket: $1")
 }
 
+combo() {
+  # Combo commands, eg. ja c mp o for create ticket, move to in progress and open in browser
+  is_first=true
+  while [[ $# -gt 0 ]]; do
+    arg="$1"
+    if [ "$is_first" = false ]; then
+      command="ja $arg"
+      echo $(grey "|> $command")
+      eval "$command"
+      if [[ $? -ne 0 ]]; then
+        echo $(red "C-C-C-Combo BREAKER: Above command failed.")
+        exit 1
+      fi
+    else
+      echo $(blue "C-C-C-Combo time:")
+      is_first=false
+    fi
+    shift
+  done
+}
+
 # Utility functions
 # --------------------------------------------------------------------
 
@@ -260,12 +281,13 @@ display_help() {
 
 		$(green "ja") » simple jira aliases $(grey "by Callum Silcock")
 
-		$(green "ja") $(yellow "c")             $(grey "|") create ticket
-		$(green "ja") $(yellow "o  <?ticket>")  $(grey "|") open ticket
-    $(green "ja") $(yellow "mt <?ticket>")  $(grey "|") move ticket to 'todo'
-		$(green "ja") $(yellow "mp <?ticket>")  $(grey "|") move ticket to 'in progress'
-    $(green "ja") $(yellow "md <?ticket>")  $(grey "|") move ticket to 'done'
-    $(green "ja") $(yellow "f  <?ticket>")  $(grey "|") focus on ticket
+		$(green "ja") $(yellow "c")               $(grey "|") create ticket
+		$(green "ja") $(yellow "o  <?ticket>")    $(grey "|") open ticket
+		$(green "ja") $(yellow "mt <?ticket>")    $(grey "|") move ticket to 'todo'
+		$(green "ja") $(yellow "mp <?ticket>")    $(grey "|") move ticket to 'in progress'
+		$(green "ja") $(yellow "md <?ticket>")    $(grey "|") move ticket to 'done'
+		$(green "ja") $(yellow "f  <?ticket>")    $(grey "|") focus on ticket
+		$(green "ja") $(yellow "z  <?commands>")  $(grey "|") combine multiple single commands together
 
 	EOF
   exit 0
@@ -300,6 +322,10 @@ else
       ;;
     f | focus | focus_ticket)
       focus_on_ticket "$2"
+      exit
+      ;;
+    z | combo)
+      combo "$@"
       exit
       ;;
     -v | v | -V | version) version ;;

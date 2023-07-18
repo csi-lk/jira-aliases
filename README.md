@@ -7,9 +7,13 @@ Aliases and helpers for many jira related tasks to speed up my workflow
 ```bash
 ja » simple jira aliases by Callum Silcock
 
-ja c             | create ticket
-ja o  <?ticket>  | open ticket
-ja mp <?ticket>  | move ticket to 'in progress'
+ja c               | create ticket
+ja o  <?ticket>    | open ticket
+ja mt <?ticket>    | move ticket to 'todo'
+ja mp <?ticket>    | move ticket to 'in progress'
+ja md <?ticket>    | move ticket to 'done'
+ja f  <?ticket>    | focus on ticket
+ja z  <?commands>  | combine multiple single commands together
 ```
 
 `?ticket` will always fall back to your previously created ticket
