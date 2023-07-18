@@ -84,7 +84,7 @@ write_config() {
   echo "PROJECT_KEY=$project_key" >&3
   echo "ACCESS_TOKEN=$access_token" >&3
   echo "EPIC_KEY=$epic_key" >&3
-  echo "LAST_TICKET=" >&3
+  echo "FOCUSED_TICKET=" >&3
   exec 3>&-
 }
 
@@ -169,34 +169,20 @@ EOF
 
   echo $(green "Created Ticket: $created_ticket")
 
-  update_config_value "LAST_TICKET" "$created_ticket"
+  update_config_value "FOCUSED_TICKET" "$created_ticket"
 
 }
 
 open_ticket() {
-  # TODO: move error cases to own function for DRY
-  the_ticket="$LAST_TICKET"
-  if [[ ! -z "$1" ]]; then
-    the_ticket="$1"
-  fi
-  if [[ -z "$the_ticket" ]]; then
-    err_missing_param "jira ticket to open" "o"
-  fi
-  jira_url="$JIRA_URL/browse/$the_ticket"
+  focused_ticket=$(get_focused_ticket "$1" "o")
+  jira_url="$JIRA_URL/browse/$focused_ticket"
   echo $(grey "Opening: $jira_url")
   open "$jira_url"
 }
 
 # TODO: should be able to pass transition IDs in
 transition_ticket() {
-  # TODO: move error cases to own function for DRY
-  the_ticket="$LAST_TICKET"
-  if [[ ! -z "$1" ]]; then
-    the_ticket="$1"
-  fi
-  if [[ -z "$the_ticket" ]]; then
-    err_missing_param "jira ticket to move" "mp"
-  fi
+  focused_ticket=$(get_focused_ticket "$1" "mp")
 
   # TODO: Transition IDs should be configurable
   TRANSITION_ID="71" # Transition ID for "In Progress"
@@ -215,9 +201,9 @@ EOF
   response=$(curl -s -X POST \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -H "Content-Type: application/json" \
-    --data "$JSON_DATA" "$JIRA_URL/rest/api/2/issue/$the_ticket/transitions")
+    --data "$JSON_DATA" "$JIRA_URL/rest/api/2/issue/$focused_ticket/transitions")
 
-  echo $(green "Moved $the_ticket -> IN PROGRESS")
+  echo $(green "Moved $focused_ticket -> IN PROGRESS")
 }
 
 # Utility functions
@@ -225,9 +211,6 @@ EOF
 
 version() {
   echo "$VERSION"
-  created_ticket="ANZX-100"
-  update_config_value "LAST_TICKET" "$created_ticket"
-  echo "$LAST_TICKET"
 }
 
 err_missing_param() {
@@ -238,6 +221,17 @@ err_missing_param() {
 
 	EOF
   exit 1
+}
+
+get_focused_ticket() {
+  the_ticket="$FOCUSED_TICKET"
+  if [[ ! -z "$1" ]]; then
+    the_ticket="$1"
+  fi
+  if [[ -z "$the_ticket" ]]; then
+    err_missing_param "jira ticket not passed" "$2"
+  fi
+  echo "$the_ticket"
 }
 
 display_help() {
