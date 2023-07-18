@@ -180,18 +180,19 @@ open_ticket() {
   open "$jira_url"
 }
 
-# TODO: should be able to pass transition IDs in
+# 1: Ticket Key (eg. TICKET-123)
+# 2: Transition ID (eg. 71)
+# 3: Transition string (eg. IN PROGRESS)
 transition_ticket() {
   focused_ticket=$(get_focused_ticket "$1" "mp")
 
   # TODO: Transition IDs should be configurable
-  TRANSITION_ID="71" # Transition ID for "In Progress"
 
   JSON_DATA=$(
     cat <<EOF
 {
   "transition": {
-    "id": "$TRANSITION_ID"
+    "id": "$2"
   }
 }
 EOF
@@ -203,7 +204,27 @@ EOF
     -H "Content-Type: application/json" \
     --data "$JSON_DATA" "$JIRA_URL/rest/api/2/issue/$focused_ticket/transitions")
 
-  echo $(green "Moved $focused_ticket -> IN PROGRESS")
+  echo $(green "Moved $focused_ticket -> $3")
+}
+
+move_todo() {
+  TRANSITION_TODO="21"
+  transition_ticket "$1" "$TRANSITION_TODO" "TODO"
+}
+
+move_in_progress() {
+  TRANSITION_IN_PROGRESS="71"
+  transition_ticket "$1" "$TRANSITION_IN_PROGRESS" "IN PROGRESS"
+}
+
+move_done() {
+  TRANSITION_DONE="141"
+  transition_ticket "$1" "$TRANSITION_DONE" "DONE"
+}
+
+focus_on_ticket() {
+  update_config_value "FOCUSED_TICKET" "$1"
+  echo $(green "Focusing on ticket: $1")
 }
 
 # Utility functions
@@ -241,7 +262,10 @@ display_help() {
 
 		$(green "ja") $(yellow "c")             $(grey "|") create ticket
 		$(green "ja") $(yellow "o  <?ticket>")  $(grey "|") open ticket
+    $(green "ja") $(yellow "mt <?ticket>")  $(grey "|") move ticket to 'todo'
 		$(green "ja") $(yellow "mp <?ticket>")  $(grey "|") move ticket to 'in progress'
+    $(green "ja") $(yellow "md <?ticket>")  $(grey "|") move ticket to 'done'
+    $(green "ja") $(yellow "f  <?ticket>")  $(grey "|") focus on ticket
 
 	EOF
   exit 0
@@ -262,8 +286,20 @@ else
       open_ticket "$2"
       exit
       ;;
+    mt | move_todo | todo)
+      move_todo "$2"
+      exit
+      ;;
     mp | move_in_progress | progress | prog)
-      transition_ticket "$2"
+      move_in_progress "$2"
+      exit
+      ;;
+    md | move_done | done)
+      move_done "$2"
+      exit
+      ;;
+    f | focus | focus_ticket)
+      focus_on_ticket "$2"
       exit
       ;;
     -v | v | -V | version) version ;;
