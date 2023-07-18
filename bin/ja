@@ -174,20 +174,60 @@ EOF
 }
 
 open_ticket() {
-  if [ -z "$1" ]; then
-    echo 'ok'
-    if [[ -v "LAST_TICKET" ]]; then
-      open "$JIRA_URL/browse/$LAST_TICKET"
-    else
-      err_missing_param "jira ticket to open" "o"
-    fi
-  else
-    open "$JIRA_URL/browse/$1"
+  # TODO: move error cases to own function for DRY
+  the_ticket="$LAST_TICKET"
+  if [[ ! -z "$1" ]]; then
+    the_ticket="$1"
   fi
+  if [[ -z "$the_ticket" ]]; then
+    err_missing_param "jira ticket to open" "o"
+  fi
+  jira_url="$JIRA_URL/browse/$the_ticket"
+  echo $(grey "Opening: $jira_url")
+  open "$jira_url"
 }
+
+# TODO: should be able to pass transition IDs in
+transition_ticket() {
+  # TODO: move error cases to own function for DRY
+  the_ticket="$LAST_TICKET"
+  if [[ ! -z "$1" ]]; then
+    the_ticket="$1"
+  fi
+  if [[ -z "$the_ticket" ]]; then
+    err_missing_param "jira ticket to move" "mp"
+  fi
+
+  # TODO: Transition IDs should be configurable
+  TRANSITION_ID="71" # Transition ID for "In Progress"
+
+  JSON_DATA=$(
+    cat <<EOF
+{
+  "transition": {
+    "id": "$TRANSITION_ID"
+  }
+}
+EOF
+  )
+
+  # Send the API request to move the ticket
+  response=$(curl -s -X POST \
+    -H "Authorization: Bearer $ACCESS_TOKEN" \
+    -H "Content-Type: application/json" \
+    --data "$JSON_DATA" "$JIRA_URL/rest/api/2/issue/$the_ticket/transitions")
+
+  echo $(green "Moved $the_ticket -> IN PROGRESS")
+}
+
+# Utility functions
+# --------------------------------------------------------------------
 
 version() {
   echo "$VERSION"
+  created_ticket="ANZX-100"
+  update_config_value "LAST_TICKET" "$created_ticket"
+  echo "$LAST_TICKET"
 }
 
 err_missing_param() {
@@ -205,8 +245,9 @@ display_help() {
 
 		$(green "ja") » simple jira aliases $(grey "by Callum Silcock")
 
-		$(green "ja") $(yellow "c")            $(grey "|") create ticket
-		$(green "ja") $(yellow "o")            $(grey "|") open ticket
+		$(green "ja") $(yellow "c")             $(grey "|") create ticket
+		$(green "ja") $(yellow "o  <?ticket>")  $(grey "|") open ticket
+		$(green "ja") $(yellow "mp <?ticket>")  $(grey "|") move ticket to 'in progress'
 
 	EOF
   exit 0
@@ -225,6 +266,10 @@ else
     c | create) create ;;
     o | open)
       open_ticket "$2"
+      exit
+      ;;
+    mp | move_in_progress | progress | prog)
+      transition_ticket "$2"
       exit
       ;;
     -v | v | -V | version) version ;;

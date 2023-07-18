@@ -2,6 +2,18 @@
 
 Aliases and helpers for many jira related tasks to speed up my workflow
 
+## Usage
+
+```bash
+ja » simple jira aliases by Callum Silcock
+
+ja c             | create ticket
+ja o  <?ticket>  | open ticket
+ja mp <?ticket>  | move ticket to 'in progress'
+```
+
+`?ticket` will always fall back to your previously created ticket
+
 ## Installation
 
 ### Linux / OSX
