@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-VERSION="1.0.0"
-CONFIG_FOLDER="$HOME/.ja/$VERSION/"
+CONFIG_FOLDER="$HOME/.ja/"
 CONFIG_FILE="$CONFIG_FOLDER/jira-alias.ini"
+VERSION_URL="https://raw.githubusercontent.com/csi-lk/jira-aliases/main/.release-please-manifest.json"
 
 # Colors and formatting
 # --------------------------------------------------------------------
@@ -85,6 +85,9 @@ write_config() {
   echo "ACCESS_TOKEN=$access_token" >&3
   echo "EPIC_KEY=$epic_key" >&3
   echo "FOCUSED_TICKET=" >&3
+  echo "PHONE_HOME_HOURS=24" >&3
+  echo "CURRENT_VERSION=$(get_version_from_remote_manifest)" >&3
+  echo "LAST_PHONE_HOME=$(date +%s)" >&3
   exec 3>&-
 }
 
@@ -285,6 +288,37 @@ get_focused_ticket() {
   echo "$the_ticket"
 }
 
+get_version_from_remote_manifest() {
+  local json_response version
+  json_response=$(curl -s "$VERSION_URL")
+  version=$(echo "$json_response" | grep -o "\".\": *\"[^\"]*\"" | cut -d'"' -f4)
+  echo "$version"
+}
+
+get_latest_release() {
+  local current_time phone_home_seconds version
+  current_time=$(date +%s)
+  phone_home_seconds=(PHONE_HOME_HOURS * 24 * 24)
+  # Check if 24 hours have passed since the last check
+  if ((current_time - LAST_PHONE_HOME >= phone_home_seconds)); then
+    update_config_value "LAST_PHONE_HOME" "$current_time"
+    version=$(get_version_from_remote_manifest)
+    if [ -n "$version" ]; then
+      if [ "$version" != "$CURRENT_VERSION" ]; then
+        echo $(grey "------------------------------------------------------------------------------------------")
+        echo "$(green "ja") » $(green "there is an update available for download!")"
+        echo "current version: $CURRENT_VERSION, new version: $(green "$version")"
+        echo "To auto update run: "
+        echo $(grey "  curl -fsSL https://raw.githubusercontent.com/csi-lk/jira-aliases/master/install | bash")
+        echo $(grey "------------------------------------------------------------------------------------------")
+      fi
+    else
+      echo $(red "Couldn't find latest version information, you may need to manually update")
+      echo $(grey "> https://github.com/csi-lk/jira-aliases")
+    fi
+  fi
+}
+
 display_help() {
   cat <<-EOF
 
@@ -308,6 +342,7 @@ display_help() {
 # --------------------------------------------------------------------
 
 read_config
+get_latest_release
 
 # Interface
 # --------------------------------------------------------------------

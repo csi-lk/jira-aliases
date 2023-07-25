@@ -6,7 +6,7 @@ green() {
 
 install() {
     echo $(green "Downloading Jira Aliases script...")
-    curl -L#o /var/tmp/gg_$$ https://raw.githubusercontent.com/csi-lk/jira-aliases/master/bin/ja
+    curl -L#o /var/tmp/gg_$$ https://raw.githubusercontent.com/csi-lk/jira-aliases/main/bin/ja
     echo $(green "Setting permissions...")
     chmod -v +x /var/tmp/ja_$$
     echo $(green "Moving to \$PATH")
