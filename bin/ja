@@ -304,6 +304,9 @@ display_help() {
   exit 0
 }
 
+# Run Every Time
+# --------------------------------------------------------------------
+
 read_config
 
 # Interface
