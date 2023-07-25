@@ -1,0 +1,15 @@
+# Changelog
+
+## 1.0.0 (2023-07-25)
+
+
+### Features
+
+* add ability to transition ticket to in progress ([384661e](https://github.com/csi-lk/jira-aliases/commit/384661ea8ae2e9ff247918457b09088526f6e061))
+* add comboing for commands, update readme ([28bd900](https://github.com/csi-lk/jira-aliases/commit/28bd900ad49da4c82187f2d6c06ce4e122861fe9))
+* add initial jira alias bash script ([e84c87c](https://github.com/csi-lk/jira-aliases/commit/e84c87cb218babc7820cbd935c3adc00ba85f963))
+* add installation script, windows counterpart, version fn ([80ec95a](https://github.com/csi-lk/jira-aliases/commit/80ec95a3eec93539cee817fbfabe12341645d689))
+* add more movement targets, todo and done ([6271f13](https://github.com/csi-lk/jira-aliases/commit/6271f13ffc85a7868e6eb9ca0d10e46dc7f0c2d1))
+* add open ticket in browser function that remebers last created ([3972075](https://github.com/csi-lk/jira-aliases/commit/3972075656134439875d071595354c8afed885c7))
+* add shortcut to move tickets to 'review' ([c2484b5](https://github.com/csi-lk/jira-aliases/commit/c2484b5993031f69fca219dd1719cb7f71a1500f))
+* copy ticket to clipboard on mac ([6973195](https://github.com/csi-lk/jira-aliases/commit/697319584f90042a785c4aa5c7846a4ab30b1200))
