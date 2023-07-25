@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/csi-lk/jira-aliases/compare/v1.2.0...v1.3.0) (2023-07-25)
+
+
+### Features
+
+* update version function to now list remote version ([ab7699f](https://github.com/csi-lk/jira-aliases/commit/ab7699f8158823b86f7bc9c1362b7a9b418d1c1e))
+
 ## [1.2.0](https://github.com/csi-lk/jira-aliases/compare/v1.1.0...v1.2.0) (2023-07-25)
 
 
