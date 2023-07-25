@@ -232,6 +232,10 @@ focus_on_ticket() {
   echo $(green "Focusing on ticket: $1")
 }
 
+copy_ticket_to_clipboard() {
+  get_focused_ticket | pbcopy
+}
+
 combo() {
   # Combo commands, eg. ja c mp o for create ticket, move to in progress and open in browser
   is_first=true
@@ -287,11 +291,12 @@ display_help() {
 		$(green "ja") » simple jira aliases $(grey "by Callum Silcock")
 
 		$(green "ja") $(yellow "c")               $(grey "|") create ticket
-		$(green "ja") $(yellow "o  <?ticket>")    $(grey "|") open ticket
+		$(green "ja") $(yellow "o  <?ticket>")    $(grey "|") open ticket in browser
 		$(green "ja") $(yellow "mt <?ticket>")    $(grey "|") move ticket to 'todo'
 		$(green "ja") $(yellow "mp <?ticket>")    $(grey "|") move ticket to 'in progress'
 		$(green "ja") $(yellow "mr <?ticket>")    $(grey "|") move ticket to 'review'
 		$(green "ja") $(yellow "md <?ticket>")    $(grey "|") move ticket to 'done'
+		$(green "ja") $(yellow "cp")              $(grey "|") copy ticket to clipboard
 		$(green "ja") $(yellow "f  <?ticket>")    $(grey "|") focus on ticket
 		$(green "ja") $(yellow "z  <?commands>")  $(grey "|") combine multiple single commands together
 
@@ -328,6 +333,10 @@ else
       ;;
     md | move_done | done)
       move_done "$2"
+      exit
+      ;;
+    cp | copy | copy_ticket | copy_to_clipboard)
+      copy_ticket_to_clipboard "$2"
       exit
       ;;
     f | focus | focus_ticket)

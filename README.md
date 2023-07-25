@@ -8,11 +8,12 @@ Aliases and helpers for many jira related tasks to speed up my workflow
 ja » simple jira aliases by Callum Silcock
 
 ja c               | create ticket
-ja o  <?ticket>    | open ticket
+ja o  <?ticket>    | open ticket in browser
 ja mt <?ticket>    | move ticket to 'todo'
 ja mp <?ticket>    | move ticket to 'in progress'
 ja mr <?ticket>    | move ticket to 'review'
 ja md <?ticket>    | move ticket to 'done'
+ja cp              | copy ticket to clipboard
 ja f  <?ticket>    | focus on ticket
 ja z  <?commands>  | combine multiple single commands together
 ```
