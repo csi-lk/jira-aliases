@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/csi-lk/jira-aliases/compare/v1.1.0...v1.2.0) (2023-07-25)
+
+
+### Features
+
+* check git for new versions ([6d13ccb](https://github.com/csi-lk/jira-aliases/commit/6d13ccbdaca6ac06e3095e45260e8da34cbbef55))
+
 ## [1.1.0](https://github.com/csi-lk/jira-aliases/compare/v1.0.0...v1.1.0) (2023-07-25)
 
 
