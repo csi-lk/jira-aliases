@@ -1,0 +1,8 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "exclude-paths": [".github", ".gitignore", "README.md"]
+    }
+  }
+}
