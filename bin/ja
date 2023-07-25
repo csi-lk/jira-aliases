@@ -264,7 +264,7 @@ combo() {
 # --------------------------------------------------------------------
 
 version() {
-  echo "$VERSION"
+  echo "current version: $CURRENT_VERSION, remote version: $(green "$(get_version_from_remote_manifest)")"
 }
 
 err_missing_param() {
