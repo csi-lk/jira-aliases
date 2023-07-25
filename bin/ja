@@ -217,6 +217,11 @@ move_in_progress() {
   transition_ticket "$1" "$TRANSITION_IN_PROGRESS" "IN PROGRESS"
 }
 
+move_review() {
+  TRANSITION_IN_PROGRESS="91"
+  transition_ticket "$1" "$TRANSITION_IN_PROGRESS" "REVIEW"
+}
+
 move_done() {
   TRANSITION_DONE="141"
   transition_ticket "$1" "$TRANSITION_DONE" "DONE"
@@ -285,6 +290,7 @@ display_help() {
 		$(green "ja") $(yellow "o  <?ticket>")    $(grey "|") open ticket
 		$(green "ja") $(yellow "mt <?ticket>")    $(grey "|") move ticket to 'todo'
 		$(green "ja") $(yellow "mp <?ticket>")    $(grey "|") move ticket to 'in progress'
+		$(green "ja") $(yellow "mr <?ticket>")    $(grey "|") move ticket to 'review'
 		$(green "ja") $(yellow "md <?ticket>")    $(grey "|") move ticket to 'done'
 		$(green "ja") $(yellow "f  <?ticket>")    $(grey "|") focus on ticket
 		$(green "ja") $(yellow "z  <?commands>")  $(grey "|") combine multiple single commands together
@@ -314,6 +320,10 @@ else
       ;;
     mp | move_in_progress | progress | prog)
       move_in_progress "$2"
+      exit
+      ;;
+    mr | move_review | review)
+      move_review "$2"
       exit
       ;;
     md | move_done | done)

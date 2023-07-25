@@ -11,6 +11,7 @@ ja c               | create ticket
 ja o  <?ticket>    | open ticket
 ja mt <?ticket>    | move ticket to 'todo'
 ja mp <?ticket>    | move ticket to 'in progress'
+ja mr <?ticket>    | move ticket to 'review'
 ja md <?ticket>    | move ticket to 'done'
 ja f  <?ticket>    | focus on ticket
 ja z  <?commands>  | combine multiple single commands together
