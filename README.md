@@ -38,9 +38,14 @@ Clone the repo and
 
 ```bash
 git clone git@github.com:csi-lk/jira-aliases.git
-sudo chmod -v +x jira-aliases/bin/ja
-sudo cp jira-aliases/bin/ja /usr/local/bin/ja
-ja -V
+mv -f jira-aliases "$HOME/.jira-aliases"
+chmod -v +x "$INSTALL_PATH"/bin/ja
+# .bashrc
+echo "export PATH=\$HOME/.jira-aliases/bin:\$PATH" >>~/.bashrc
+# .zshrc
+echo "export PATH=\$HOME/.jira-aliases/bin:\$PATH" >>~/.zshrc
+export PATH=$HOME/.jira-aliases/bin:$PATH
+ja -h
 ```
 
 ### Windows

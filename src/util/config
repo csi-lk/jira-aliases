@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+CONFIG_FOLDER="$HOME/.ja/"
+CONFIG_FILE="$CONFIG_FOLDER/jira-alias.ini"
+
+check_config_exists() {
+    if [ -f "$CONFIG_FILE" ]; then
+        return 0 # True (file exists)
+    else
+        return 1 # False (file does not exist)
+    fi
+}
+
+run_setup() {
+    $(grey "|> Creating file: $CONFIG_FILE")
+    mkdir -p "$CONFIG_FOLDER"
+    touch "$CONFIG_FILE"
+    write_config
+    exit 1
+}
+
+read_config() {
+    if check_config_exists; then
+        while IFS='=' read -r key value; do
+            if [[ ! "$key" =~ ^\s*# && -n "$key" ]]; then
+                value=$(echo "$value" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+                eval "$key=\"$value\""
+            fi
+        done <"$CONFIG_FILE"
+    else
+        echo "$(green "ja") » simple jira aliases $(grey "by Callum Silcock")"
+        echo "Looks like there's no config file, so lets create you one"
+        run_setup
+    fi
+}
+
+write_config() {
+    echo $(grey "What is your companies service url?\n")
+    while [[ -z "$jira_url" ]]; do
+        read -ep "$(grey "Jira URL: ")" jira_url
+    done
+    echo $(grey "Next up we're going to generate a Personal Access Token")
+    echo $(grey "I'll open the url to do this now")
+    sleep 2
+    open "$jira_url/secure/ViewProfile.jspa?selectedTab=com.atlassian.pats.pats-plugin:jira-user-personal-access-tokens"
+    echo $(grey "Now copy/paste the generated token to the console")
+    while [[ -z "$access_token" ]]; do
+        read -ep "$(grey "Personal Access Token: ")" access_token
+    done
+    echo $(grey "What is the main project key you would like to create tickets within")
+    while [[ -z "$project_key" ]]; do
+        read -ep "$(grey "Project Key: ")" project_key
+    done
+    echo $(grey "What is the main epic you would like to create tickets within")
+    while [[ -z "$epic_key" ]]; do
+        read -ep "$(grey "Epic Ticket Number: ")" epic_key
+    done
+
+    echo $(green "Writing config...")
+
+    exec 3>"$CONFIG_FILE"
+    echo "# This is a generated file from Jira Aliases" >&3
+    echo "JIRA_URL=$jira_url" >&3
+    echo "PROJECT_KEY=$project_key" >&3
+    echo "ACCESS_TOKEN=$access_token" >&3
+    echo "EPIC_KEY=$epic_key" >&3
+    echo "FOCUSED_TICKET=" >&3
+    echo "PHONE_HOME_HOURS=24" >&3
+    echo "CURRENT_VERSION=$(get_version_from_remote_manifest)" >&3
+    echo "LAST_PHONE_HOME=$(date +%s)" >&3
+    exec 3>&-
+}
+
+update_config_value() {
+    local key="$1"
+    local new_value="$2"
+
+    mapfile -t config_lines <"$CONFIG_FILE"
+
+    for i in "${!config_lines[@]}"; do
+        line="${config_lines[$i]}"
+        if [[ $line == $key=* ]]; then
+            config_lines[$i]="$key=$new_value"
+            break
+        fi
+    done
+
+    printf "%s\n" "${config_lines[@]}" >"$CONFIG_FILE"
+}
