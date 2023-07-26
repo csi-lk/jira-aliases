@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/csi-lk/jira-aliases/compare/v1.4.0...v1.4.1) (2023-07-26)
+
+
+### Bug Fixes
+
+* installation script pulling from branch dir not main ([f770572](https://github.com/csi-lk/jira-aliases/commit/f770572a1ac5baa4770954039628724089df7dd1))
+
 ## [1.4.0](https://github.com/csi-lk/jira-aliases/compare/v1.3.0...v1.4.0) (2023-07-26)
 
 
