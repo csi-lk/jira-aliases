@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 BASE_DIRECTORY="/usr/local/jira-aliases"
-GITHUB_BRANCH="install-upgrade"
+GITHUB_BRANCH="main"
 GITHUB_ARCHIVE="https://github.com/csi-lk/jira-aliases/archive/$GITHUB_BRANCH.zip"
 INSTALL_PATH="$HOME/.jira-aliases"
 
