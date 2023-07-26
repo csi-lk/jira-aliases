@@ -1,17 +1,62 @@
 #!/usr/bin/env bash
 
-green() {
-    printf "\e[0;32m%s\e[0m" "$1"
+BASE_DIRECTORY="/usr/local/jira-aliases"
+GITHUB_BRANCH="install-upgrade"
+GITHUB_ARCHIVE="https://github.com/csi-lk/jira-aliases/archive/$GITHUB_BRANCH.zip"
+INSTALL_PATH="$HOME/.jira-aliases"
+
+# Include relevant files
+# --------------------------------------------------------------------
+source "$BASE_DIRECTORY/src/util/colors"
+
+install_to_path() {
+    if [[ ":$PATH:" == *":$HOME/.jira-aliases/bin:"* ]]; then
+        echo $(grey "|> ja already exists in path, moving on...")
+    else
+        echo $(grey "|> adding ja to ~/.bashrc path")
+        echo "export PATH=\$HOME/.jira-aliases/bin:\$PATH" >>~/.bashrc
+        if [ -f ~/.zshrc ]; then
+            echo $(grey "|> adding ja to ~/.zshrc path")
+            echo "export PATH=\$HOME/.jira-aliases/bin:\$PATH" >>~/.zshrc
+        fi
+        export PATH=$HOME/.jira-aliases/bin:$PATH
+        echo $(green "|> 'ja' added to PATH")
+        echo $(grey "|> you may need to restart the shell or run 'source ~/.bashrc' for changes to take effect.")
+        echo $(grey "|> you can add it manually if required by adding:")
+        echo $(grey "      export PATH=\$HOME/.jira-aliases/bin:\$PATH")
+    fi
 }
 
 install() {
-    echo $(green "Downloading Jira Aliases script...")
-    curl -L#o /var/tmp/gg_$$ https://raw.githubusercontent.com/csi-lk/jira-aliases/main/bin/ja
-    echo $(green "Setting permissions...")
-    chmod -v +x /var/tmp/ja_$$
-    echo $(green "Moving to \$PATH")
-    sudo mv -fv /var/tmp/ja_$$ /usr/local/bin/ja
-    echo $(green "Successfully installed, running setup")
+    set -e # exit if error
+
+    echo "$(green "ja") » simple jira aliases $(grey "by Callum Silcock")"
+    echo $(green "Let's get you setup...")
+
+    echo $(grey "|> Downloading Jira Aliases...")
+    curl -L#o /var/tmp/ja_$$.zip "$GITHUB_ARCHIVE"
+    echo $(grey "|> Cleaning up existing install...")
+    if [ -d "$INSTALL_PATH" ]; then
+        rm -rf "$INSTALL_PATH"
+    fi
+    echo $(grey "|> Unzipping...")
+    unzip -q /var/tmp/ja_$$ -d ~
+    echo $(grey "|> Moving to $INSTALL_PATH ...")
+    mv -f ~/jira-aliases-$GITHUB_BRANCH "$INSTALL_PATH"
+    echo $(grey "|> Setting permissions...")
+    chmod -v +x "$INSTALL_PATH"/bin/ja
+    source "$BASE_DIRECTORY/src/util/config"  # Load config
+    source "$BASE_DIRECTORY/src/util/version" # Load version
+    if check_config_exists; then
+        version=$(get_version_from_remote_manifest)
+        update_config_value "CURRENT_VERSION" "$version"
+        echo $(green "|> Successfully upgraded!")
+    else
+        echo $(green "|> Successfully installed, running setup...")
+        run_setup
+    fi
+    install_to_path
+    echo $(green "|> Installation Finished!")
     ja -h
 }
 

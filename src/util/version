@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+VERSION_URL="https://raw.githubusercontent.com/csi-lk/jira-aliases/main/.release-please-manifest.json"
+
+version() {
+    echo "current version: $CURRENT_VERSION, remote version: $(green "$(get_version_from_remote_manifest)")"
+}
+
+get_version_from_remote_manifest() {
+    local json_response version
+    json_response=$(curl -s "$VERSION_URL")
+    version=$(echo "$json_response" | grep -o "\".\": *\"[^\"]*\"" | cut -d'"' -f4)
+    echo "$version"
+}

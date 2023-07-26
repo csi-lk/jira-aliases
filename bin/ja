@@ -1,112 +1,12 @@
 #!/usr/bin/env bash
 
-CONFIG_FOLDER="$HOME/.ja/"
-CONFIG_FILE="$CONFIG_FOLDER/jira-alias.ini"
-VERSION_URL="https://raw.githubusercontent.com/csi-lk/jira-aliases/main/.release-please-manifest.json"
+BASE_DIRECTORY="/usr/local/jira-aliases"
 
-# Colors and formatting
+# Include relevant files
 # --------------------------------------------------------------------
-
-grey() {
-  printf "\e[0;90m%s\e[0m" "$1"
-}
-
-green() {
-  printf "\e[0;32m%s\e[0m" "$1"
-}
-
-red() {
-  printf "\e[1;31m%s\e[0m" "$1"
-}
-
-yellow() {
-  printf "\e[0;33m%s\e[0m" "$1"
-}
-
-blue() {
-  printf "\e[0;36m%s\e[0m" "$1"
-}
-
-# Config
-# --------------------------------------------------------------------
-
-read_config() {
-  if [ -f "$CONFIG_FILE" ]; then
-    while IFS='=' read -r key value; do
-      if [[ ! "$key" =~ ^\s*# && -n "$key" ]]; then
-        value=$(echo "$value" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-        eval "$key=\"$value\""
-      fi
-    done <"$CONFIG_FILE"
-  else
-    cat <<-EOF
-
-		$(green "ja") » simple jira aliases $(grey "by Callum Silcock")
-
-		Looks like there's no config file, so lets create you one
-
-		$(grey "Creating file: $CONFIG_FILE")
-EOF
-    mkdir -p "$CONFIG_FOLDER"
-    touch "$CONFIG_FILE"
-    write_config
-    exit 1
-  fi
-}
-
-write_config() {
-  echo $(grey "What is your companies service url?\n")
-  while [[ -z "$jira_url" ]]; do
-    read -ep "$(grey "Jira URL: ")" jira_url
-  done
-  echo $(grey "Next up we're going to generate a Personal Access Token")
-  echo $(grey "I'll open the url to do this now")
-  sleep 2
-  open "$jira_url/secure/ViewProfile.jspa?selectedTab=com.atlassian.pats.pats-plugin:jira-user-personal-access-tokens"
-  echo $(grey "Now copy/paste the generated token to the console")
-  while [[ -z "$access_token" ]]; do
-    read -ep "$(grey "Personal Access Token: ")" access_token
-  done
-  echo $(grey "What is the main project key you would like to create tickets within")
-  while [[ -z "$project_key" ]]; do
-    read -ep "$(grey "Project Key: ")" project_key
-  done
-  echo $(grey "What is the main epic you would like to create tickets within")
-  while [[ -z "$epic_key" ]]; do
-    read -ep "$(grey "Epic Ticket Number: ")" epic_key
-  done
-
-  echo $(green "Writing config...")
-
-  exec 3>"$CONFIG_FILE"
-  echo "# This is a generated file from Jira Aliases" >&3
-  echo "JIRA_URL=$jira_url" >&3
-  echo "PROJECT_KEY=$project_key" >&3
-  echo "ACCESS_TOKEN=$access_token" >&3
-  echo "EPIC_KEY=$epic_key" >&3
-  echo "FOCUSED_TICKET=" >&3
-  echo "PHONE_HOME_HOURS=24" >&3
-  echo "CURRENT_VERSION=$(get_version_from_remote_manifest)" >&3
-  echo "LAST_PHONE_HOME=$(date +%s)" >&3
-  exec 3>&-
-}
-
-update_config_value() {
-  local key="$1"
-  local new_value="$2"
-
-  mapfile -t config_lines <"$CONFIG_FILE"
-
-  for i in "${!config_lines[@]}"; do
-    line="${config_lines[$i]}"
-    if [[ $line == $key=* ]]; then
-      config_lines[$i]="$key=$new_value"
-      break
-    fi
-  done
-
-  printf "%s\n" "${config_lines[@]}" >"$CONFIG_FILE"
-}
+source "$BASE_DIRECTORY/src/util/colors"  # Colors
+source "$BASE_DIRECTORY/src/util/config"  # Load config
+source "$BASE_DIRECTORY/src/util/version" # Handle versions
 
 # Functions
 # --------------------------------------------------------------------
@@ -137,9 +37,6 @@ create() {
     read -ep "$(grey "Description: ")" ticket_description
   done
   echo $(green "Creating ticket...")
-  echo $(grey "  [$ticket_type]----------------------------------")
-  echo $(grey "  $ticket_title")
-  echo $(grey "  $ticket_description")
 
   # Create the JSON payload for the Jira ticket
   JSON_DATA=$(
@@ -170,7 +67,10 @@ EOF
 
   created_ticket=$(echo "$response" | grep -o "\"key\": *\"[^\"]*\"" | awk -F "\"" '{print $4}')
 
-  echo $(green "Created Ticket: $created_ticket")
+  echo $(green "Created Ticket: ")
+  echo $(grey "  $created_ticket -----------------------------[$ticket_type]")
+  echo $(grey "  $ticket_title")
+  echo $(grey "  $ticket_description")
 
   update_config_value "FOCUSED_TICKET" "$created_ticket"
 
@@ -263,10 +163,6 @@ combo() {
 # Utility functions
 # --------------------------------------------------------------------
 
-version() {
-  echo "current version: $CURRENT_VERSION, remote version: $(green "$(get_version_from_remote_manifest)")"
-}
-
 err_missing_param() {
   cat <<-EOF
 
@@ -288,13 +184,6 @@ get_focused_ticket() {
   echo "$the_ticket"
 }
 
-get_version_from_remote_manifest() {
-  local json_response version
-  json_response=$(curl -s "$VERSION_URL")
-  version=$(echo "$json_response" | grep -o "\".\": *\"[^\"]*\"" | cut -d'"' -f4)
-  echo "$version"
-}
-
 get_latest_release() {
   local current_time phone_home_seconds version
   current_time=$(date +%s)
@@ -307,7 +196,7 @@ get_latest_release() {
       if [ "$version" != "$CURRENT_VERSION" ]; then
         echo $(grey "------------------------------------------------------------------------------------------")
         echo "$(green "ja") » $(green "there is an update available for download!")"
-        echo "current version: $CURRENT_VERSION, new version: $(green "$version")"
+        version
         echo "To auto update run: "
         echo $(grey "  curl -fsSL https://raw.githubusercontent.com/csi-lk/jira-aliases/master/install | bash")
         echo $(grey "------------------------------------------------------------------------------------------")
