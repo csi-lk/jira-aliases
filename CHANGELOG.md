@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/csi-lk/jira-aliases/compare/v1.3.0...v1.4.0) (2023-07-26)
+
+
+### Features
+
+* upgrade install script, split files for sourcing ([26c5a99](https://github.com/csi-lk/jira-aliases/commit/26c5a99ede00a1004c714941be39e94456df4f2a))
+
 ## [1.3.0](https://github.com/csi-lk/jira-aliases/compare/v1.2.0...v1.3.0) (2023-07-25)
 
 
