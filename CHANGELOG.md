@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/csi-lk/jira-aliases/compare/v2.1.0...v2.2.0) (2023-08-14)
+
+
+### Features
+
+* add 'info' command for getting info about focused or x ticket ([fdabfbd](https://github.com/csi-lk/jira-aliases/commit/fdabfbdc26fb342604ce65a19621e1d83e2aed2d))
+
 ## [2.1.0](https://github.com/csi-lk/jira-aliases/compare/v2.0.0...v2.1.0) (2023-08-14)
 
 
