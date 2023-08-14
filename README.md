@@ -24,7 +24,11 @@ ja z  <?commands>  | combine multiple single commands together
 
 ### Linux / OSX
 
-Make sure curl is installed
+Make sure `curl` and `jq` are installed eg.
+
+```bash
+brew install jq
+```
 
 #### Automagic (recommended)
 
