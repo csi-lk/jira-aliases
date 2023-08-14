@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/csi-lk/jira-aliases/compare/v1.5.0...v2.0.0) (2023-08-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* add jq requirement
+
+### Documentation
+
+* add jq requirement ([8cc4719](https://github.com/csi-lk/jira-aliases/commit/8cc4719f4054b8d4d6b6fc158378c692a996a8dd))
+
 ## [1.5.0](https://github.com/csi-lk/jira-aliases/compare/v1.4.1...v1.5.0) (2023-08-14)
 
 
