@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/csi-lk/jira-aliases/compare/v1.4.1...v1.5.0) (2023-08-14)
+
+
+### Features
+
+* get transitions based on names from API ([28e2935](https://github.com/csi-lk/jira-aliases/commit/28e2935cf039c9cff5ad1804c28ba89794068877))
+
 ## [1.4.1](https://github.com/csi-lk/jira-aliases/compare/v1.4.0...v1.4.1) (2023-07-26)
 
 
