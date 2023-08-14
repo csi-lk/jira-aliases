@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/csi-lk/jira-aliases/compare/v2.0.0...v2.1.0) (2023-08-14)
+
+
+### Features
+
+* assign ticket to me ([4bc2206](https://github.com/csi-lk/jira-aliases/commit/4bc22066860188dd769dba2f15ac09ead43d8dc5))
+
 ## [2.0.0](https://github.com/csi-lk/jira-aliases/compare/v1.5.0...v2.0.0) (2023-08-14)
 
 
