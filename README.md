@@ -14,8 +14,9 @@ ja mp <?ticket>    | move ticket to 'in progress'
 ja mr <?ticket>    | move ticket to 'review'
 ja md <?ticket>    | move ticket to 'done'
 ja cp              | copy ticket to clipboard
-ja f  <?ticket>    | focus on ticket
-ja z  <?commands>  | combine multiple single commands together
+ja f <?ticket>     | focus on ticket
+ja a <?ticket>     | assign ticket to me
+ja z <?commands>   | combine multiple single commands together
 ```
 
 `?ticket` will always fall back to your previously created ticket

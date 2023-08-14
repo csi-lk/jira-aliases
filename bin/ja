@@ -74,6 +74,13 @@ EOF
 
   update_config_value "FOCUSED_TICKET" "$created_ticket"
 
+  read -rp "Assign ticket to yourself? (Y/n): " assign_to_me
+
+  assign_to_me=$(echo "$assign_to_me" | tr '[:upper:]' '[:lower:]')
+
+  if [ -z "$assign_to_me" ] || [ "$assign_to_me" = "y" ] || [ "$assign_to_me" = "yes" ]; then
+    assign_ticket_to_me "$created_ticket"
+  fi
 }
 
 open_ticket() {
@@ -110,7 +117,7 @@ EOF
   curl -s -X POST \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -H "Content-Type: application/json" \
-    --data "$JSON_DATA" "$JIRA_URL/rest/api/2/issue/$1/transitions"
+    --data "$JSON_DATA" "$api_endpoint"
 
   echo $(green "Moved $1 -> In Progress")
 }
@@ -146,6 +153,28 @@ focus_on_ticket() {
 
 copy_ticket_to_clipboard() {
   get_focused_ticket | pbcopy
+}
+
+assign_ticket_to_me() {
+  local focused_ticket me_api_endpoint user_id assign_ticket_endpoint
+
+  focused_ticket=$(get_focused_ticket "$1" "a")
+
+  me_api_endpoint="$JIRA_URL/rest/api/2/myself"
+  assign_ticket_endpoint="$JIRA_URL/rest/api/2/issue/$focused_ticket/assignee"
+
+  user_id=$(curl -s -H "Authorization: Bearer $ACCESS_TOKEN" -X GET "$me_api_endpoint" | jq -r '.name')
+
+  if [ -z "$user_id" ]; then
+    echo $(red "Failed to get user ID")
+    exit 1
+  fi
+
+  # Assign the ticket using curl
+  curl -s -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X PUT -d "{\"name\": \"$user_id\"}" "$assign_ticket_endpoint"
+
+  echo $(green "Ticket: $focused_ticket has been assigned to User: $user_id")
+
 }
 
 combo() {
@@ -217,6 +246,15 @@ get_latest_release() {
   fi
 }
 
+unknown_command() {
+  cat <<-EOF
+
+		$(red "Unknown command: '$1'")
+
+	EOF
+  exit 1
+}
+
 display_help() {
   cat <<-EOF
 
@@ -229,8 +267,9 @@ display_help() {
 		$(green "ja") $(yellow "mr <?ticket>")    $(grey "|") move ticket to 'review'
 		$(green "ja") $(yellow "md <?ticket>")    $(grey "|") move ticket to 'done'
 		$(green "ja") $(yellow "cp")              $(grey "|") copy ticket to clipboard
-		$(green "ja") $(yellow "f  <?ticket>")    $(grey "|") focus on ticket
-		$(green "ja") $(yellow "z  <?commands>")  $(grey "|") combine multiple single commands together
+		$(green "ja") $(yellow "f <?ticket>")     $(grey "|") focus on ticket
+		$(green "ja") $(yellow "a <?ticket>")     $(grey "|") assign ticket to me
+		$(green "ja") $(yellow "z <?commands>")   $(grey "|") combine multiple single commands together
 
 	EOF
   exit 0
@@ -277,6 +316,10 @@ else
       ;;
     f | focus | focus_ticket)
       focus_on_ticket "$2"
+      exit
+      ;;
+    a | assign | assign_ticket | assign_to_me)
+      assign_ticket_to_me "$2"
       exit
       ;;
     z | combo)
