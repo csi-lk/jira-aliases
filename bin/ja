@@ -174,7 +174,41 @@ assign_ticket_to_me() {
   curl -s -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X PUT -d "{\"name\": \"$user_id\"}" "$assign_ticket_endpoint"
 
   echo $(green "Ticket: $focused_ticket has been assigned to User: $user_id")
+}
 
+get_ticket_info() {
+  local api_endpoint focused_ticket response
+  focused_ticket=$(get_focused_ticket "$1" "a")
+  api_endpoint="$JIRA_URL/rest/api/2/issue/$focused_ticket"
+
+  # Make the GET request using curl
+  response=$(curl -s -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" "$api_endpoint")
+
+  ticket_number=$(echo "$response" | jq -r '.key')
+  ticket_status=$(echo "$response" | jq -r '.fields.status.name')
+  ticket_url="$JIRA_URL/browse/$focused_ticket"
+  assignee=$(echo "$response" | jq -r '.fields.assignee.displayName')
+  title=$(echo "$response" | jq -r '.fields.summary')
+  description=$(echo "$response" | jq -r '.fields.description')
+  latest_comment=$(echo "$response" | jq -r '.fields.comment.comments | last | .body')
+
+  if [ "$latest_comment" = "null" ]; then
+    latest_comment="No comments available."
+  fi
+
+  cat <<-EOF
+
+$(green "ticket info") » $ticket_number
+
+$(grey "Status")         $(grey "|") $ticket_status
+$(grey "URL")            $(grey "|") $ticket_url
+$(grey "Assignee")       $(grey "|") $assignee
+$(grey "Title")          $(grey "|") $title
+$(grey "Description")    $(grey "|") $description
+$(grey "Latest comment") $(grey "|") $latest_comment
+
+	EOF
+  exit 0
 }
 
 combo() {
@@ -258,18 +292,19 @@ unknown_command() {
 display_help() {
   cat <<-EOF
 
-		$(green "ja") » simple jira aliases $(grey "by Callum Silcock")
+$(green "ja") » simple jira aliases $(grey "by Callum Silcock")
 
-		$(green "ja") $(yellow "c")               $(grey "|") create ticket
-		$(green "ja") $(yellow "o  <?ticket>")    $(grey "|") open ticket in browser
-		$(green "ja") $(yellow "mt <?ticket>")    $(grey "|") move ticket to 'todo'
-		$(green "ja") $(yellow "mp <?ticket>")    $(grey "|") move ticket to 'in progress'
-		$(green "ja") $(yellow "mr <?ticket>")    $(grey "|") move ticket to 'review'
-		$(green "ja") $(yellow "md <?ticket>")    $(grey "|") move ticket to 'done'
-		$(green "ja") $(yellow "cp")              $(grey "|") copy ticket to clipboard
-		$(green "ja") $(yellow "f <?ticket>")     $(grey "|") focus on ticket
-		$(green "ja") $(yellow "a <?ticket>")     $(grey "|") assign ticket to me
-		$(green "ja") $(yellow "z <?commands>")   $(grey "|") combine multiple single commands together
+$(green "ja") $(yellow "c")             $(grey "|") create ticket
+$(green "ja") $(yellow "i  <?ticket>")  $(grey "|") get info about ticket
+$(green "ja") $(yellow "o  <?ticket>")  $(grey "|") open ticket in browser
+$(green "ja") $(yellow "mt <?ticket>")  $(grey "|") move ticket to 'todo'
+$(green "ja") $(yellow "mp <?ticket>")  $(grey "|") move ticket to 'in progress'
+$(green "ja") $(yellow "mr <?ticket>")  $(grey "|") move ticket to 'review'
+$(green "ja") $(yellow "md <?ticket>")  $(grey "|") move ticket to 'done'
+$(green "ja") $(yellow "cp")            $(grey "|") copy ticket to clipboard
+$(green "ja") $(yellow "f <?ticket>")   $(grey "|") focus on ticket
+$(green "ja") $(yellow "a <?ticket>")   $(grey "|") assign ticket to me
+$(green "ja") $(yellow "z <?commands>") $(grey "|") combine multiple single commands together
 
 	EOF
   exit 0
@@ -290,6 +325,10 @@ else
   while test $# -ne 0; do
     case $1 in
     c | create) create ;;
+    i | info)
+      get_ticket_info "$2"
+      exit
+      ;;
     o | open)
       open_ticket "$2"
       exit
