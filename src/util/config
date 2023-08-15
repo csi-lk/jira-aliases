@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CONFIG_FOLDER="$HOME/.ja/"
+CONFIG_FOLDER="$HOME/.ja"
 CONFIG_FILE="$CONFIG_FOLDER/jira-alias.ini"
 
 check_config_exists() {
@@ -12,7 +12,7 @@ check_config_exists() {
 }
 
 run_setup() {
-    $(grey "|> Creating file: $CONFIG_FILE")
+    echo $(grey "|> Creating file: $CONFIG_FILE")
     mkdir -p "$CONFIG_FOLDER"
     touch "$CONFIG_FILE"
     write_config
