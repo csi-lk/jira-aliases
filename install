@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
 
-BASE_DIRECTORY="/usr/local/jira-aliases"
 GITHUB_BRANCH="main"
 GITHUB_ARCHIVE="https://github.com/csi-lk/jira-aliases/archive/$GITHUB_BRANCH.zip"
 INSTALL_PATH="$HOME/.jira-aliases"
 
 # Include relevant files
 # --------------------------------------------------------------------
-source "$BASE_DIRECTORY/src/util/colors"
+source "$INSTALL_PATH/src/util/colors"
 
 install_to_path() {
-    if [[ ":$PATH:" == *":$HOME/.jira-aliases/bin:"* ]]; then
+    if [[ ":$PATH:" == *":$INSTALL_PATH/bin:"* ]]; then
         echo $(grey "|> ja already exists in path, moving on...")
     else
         echo $(grey "|> adding ja to ~/.bashrc path")

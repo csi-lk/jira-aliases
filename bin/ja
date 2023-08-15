@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-BASE_DIRECTORY="/usr/local/jira-aliases"
+BASE_DIRECTORY="$HOME/.jira-aliases"
 
 # Include relevant files
 # --------------------------------------------------------------------
