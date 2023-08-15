@@ -264,18 +264,20 @@ get_latest_release() {
   if ((current_time - LAST_PHONE_HOME >= phone_home_seconds)); then
     update_config_value "LAST_PHONE_HOME" "$current_time"
     version=$(get_version_from_remote_manifest)
-    if [ -n "$version" ]; then
-      if [ "$version" != "$CURRENT_VERSION" ]; then
-        echo $(grey "------------------------------------------------------------------------------------------")
-        echo "$(green "ja") » $(green "there is an update available for download!")"
-        version
-        echo "To auto update run: "
-        echo $(grey "  curl -fsSL https://raw.githubusercontent.com/csi-lk/jira-aliases/master/install | bash")
-        echo $(grey "------------------------------------------------------------------------------------------")
+    if [ -n "$CURRENT_VERSION" ]; then
+      if [ -n "$version" ]; then
+        if [ "$version" != "$CURRENT_VERSION" ]; then
+          echo $(grey "------------------------------------------------------------------------------------------")
+          echo "$(green "ja") » $(green "there is an update available for download!")"
+          version
+          echo "To auto update run: "
+          echo $(grey "  curl -fsSL https://raw.githubusercontent.com/csi-lk/jira-aliases/master/install | bash")
+          echo $(grey "------------------------------------------------------------------------------------------")
+        fi
+      else
+        echo $(red "Couldn't find latest version information, you may need to manually update")
+        echo $(grey "> https://github.com/csi-lk/jira-aliases")
       fi
-    else
-      echo $(red "Couldn't find latest version information, you may need to manually update")
-      echo $(grey "> https://github.com/csi-lk/jira-aliases")
     fi
   fi
 }
