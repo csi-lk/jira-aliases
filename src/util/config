@@ -16,7 +16,6 @@ run_setup() {
     mkdir -p "$CONFIG_FOLDER"
     touch "$CONFIG_FILE"
     write_config
-    exit 1
 }
 
 read_config() {
