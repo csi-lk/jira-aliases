@@ -52,8 +52,7 @@ install() {
         update_config_value "CURRENT_VERSION" "$version"
         echo $(green "|> Successfully upgraded!")
     else
-        echo $(green "|> Successfully installed, running setup...")
-        run_setup
+        echo $(green "|> Successfully installed!")
     fi
     install_to_path
     echo $(green "|> Installation Finished!")
