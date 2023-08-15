@@ -48,8 +48,8 @@ install() {
     mv -f ~/jira-aliases-$GITHUB_BRANCH "$INSTALL_PATH"
     echo $(grey "|> Setting permissions...")
     chmod -v +x "$INSTALL_PATH"/bin/ja
-    source "$BASE_DIRECTORY/src/util/config"  # Load config
-    source "$BASE_DIRECTORY/src/util/version" # Load version
+    source "$INSTALL_PATH/src/util/config"  # Load config
+    source "$INSTALL_PATH/src/util/version" # Load version
     if check_config_exists; then
         version=$(get_version_from_remote_manifest)
         update_config_value "CURRENT_VERSION" "$version"
@@ -58,7 +58,9 @@ install() {
         echo $(green "|> Successfully installed!")
     fi
     install_to_path
+    echo $(grey "------------------------------------------------------------------------------------------")
     echo $(green "|> Installation Finished!")
+    echo $(grey "------------------------------------------------------------------------------------------")
     ja -h
 }
 
