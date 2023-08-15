@@ -4,9 +4,13 @@ GITHUB_BRANCH="main"
 GITHUB_ARCHIVE="https://github.com/csi-lk/jira-aliases/archive/$GITHUB_BRANCH.zip"
 INSTALL_PATH="$HOME/.jira-aliases"
 
-# Include relevant files
-# --------------------------------------------------------------------
-source "$INSTALL_PATH/src/util/colors"
+grey() {
+    printf "\e[0;90m%s\e[0m" "$1"
+}
+
+green() {
+    printf "\e[0;32m%s\e[0m" "$1"
+}
 
 install_to_path() {
     if [[ ":$PATH:" == *":$INSTALL_PATH/bin:"* ]]; then
