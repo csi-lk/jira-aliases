@@ -14,6 +14,7 @@ ja mt <?ticket>  | move ticket to 'todo'
 ja mp <?ticket>  | move ticket to 'in progress'
 ja mr <?ticket>  | move ticket to 'review'
 ja md <?ticket>  | move ticket to 'done'
+ja my            | show all tickets assigned to me
 ja cp            | copy ticket to clipboard
 ja f <?ticket>   | focus on ticket
 ja a <?ticket>   | assign ticket to me

@@ -211,6 +211,28 @@ $(grey "Latest comment") $(grey "|") $latest_comment
   exit 0
 }
 
+my_tickets() {
+  local api_endpoint response issueKey issueStatus issueTitle
+  api_endpoint="$JIRA_URL/rest/api/2/search?jql=assignee=silcockc"
+  response=$(curl -s -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" "$api_endpoint")
+
+  parse_json() {
+    echo "${1}" | jq -r "${2}"
+  }
+
+  for issue in $(parse_json "${response}" '.issues[] | @base64'); do
+    _jq() {
+      echo "${issue}" | base64 --decode | jq -r "${1}"
+    }
+
+    issueKey=$(_jq '.key')
+    issueStatus=$(_jq '.fields.status.name')
+    issueTitle=$(_jq '.fields.summary')
+
+    echo "[${issueKey}]: ${issueStatus} | ${issueTitle}"
+  done
+}
+
 combo() {
   # Combo commands, eg. ja c mp o for create ticket, move to in progress and open in browser
   is_first=true
@@ -303,6 +325,7 @@ $(green "ja") $(yellow "mt <?ticket>")  $(grey "|") move ticket to 'todo'
 $(green "ja") $(yellow "mp <?ticket>")  $(grey "|") move ticket to 'in progress'
 $(green "ja") $(yellow "mr <?ticket>")  $(grey "|") move ticket to 'review'
 $(green "ja") $(yellow "md <?ticket>")  $(grey "|") move ticket to 'done'
+$(green "ja") $(yellow "my")            $(grey "|") show all tickets assigned to me
 $(green "ja") $(yellow "cp")            $(grey "|") copy ticket to clipboard
 $(green "ja") $(yellow "f <?ticket>")   $(grey "|") focus on ticket
 $(green "ja") $(yellow "a <?ticket>")   $(grey "|") assign ticket to me
@@ -349,6 +372,10 @@ else
       ;;
     md | move_done | done)
       move_done "$2"
+      exit
+      ;;
+    my | my_tickets)
+      my_tickets
       exit
       ;;
     cp | copy | copy_ticket | copy_to_clipboard)
