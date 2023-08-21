@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/csi-lk/jira-aliases/compare/v2.2.1...v2.3.0) (2023-08-21)
+
+
+### Features
+
+* add 'my' command to get all my tickets ([e2819d8](https://github.com/csi-lk/jira-aliases/commit/e2819d88ce97c652cef4be5ac534b2d697cd0d0e))
+
 ## [2.2.1](https://github.com/csi-lk/jira-aliases/compare/v2.2.0...v2.2.1) (2023-08-15)
 
 
